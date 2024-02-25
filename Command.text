@@ -1,0 +1,135 @@
+#install extension
+nginx.conf hint
+
+แบบที่ 1 reverse proxy uri
+Code ของ nginx.conf
+events{}
+http {
+    include       mime.types;
+    
+    server {
+        listen       80;
+        server_name  localhost;
+
+        location / {
+           return 200 "this is a reverse proxy";
+        }
+
+        location /api/ {
+            proxy_pass http://host.docker.internal:3000/;
+        }
+    }
+}
+
+----------------------------------------------------------------------------------------------------------------------------
+#run api server
+docker run -d --name my-api -p 3000:3000 olanlab/json-server
+
+#run nginx server
+#location nginx.conf file
+#/etc/nginx/nginx.conf
+docker run -d --name my-nginx -p 8080:80 -v C:\Users\tatom\Desktop\nginx-bootcamp\conf\nginx.conf:/etc/nginx/nginx.conf nginx
+
+#open browser
+http://localhost:8080/
+output this is a reverse proxy
+
+http://localhost:8080/api/
+output json data
+
+
+แบบที่ 2 reverse proxy ชื่อ domain name
+Code ของ nginx.conf
+events {}
+
+http {
+
+    include mime.types;
+
+    server {
+        listen 80;
+        server_name localhost;
+        # server_name olanlab.com
+        # server_name api.olanlab.com
+        
+        location / {
+            return 200 "This is a reverse proxy.";
+        }
+    }
+
+    server {
+        listen 80;
+        server_name api.localhost;
+
+         location / {
+            proxy_pass http://host.docker.internal:3000/;
+        }
+    }
+}
+----------------------------------------------------------------------------------------------------------------------------
+#open browser
+http://localhost:8080/
+output this is a reverse proxy
+
+http://api.localhost:8080/
+output json data
+
+
+#Load Balancing แบบ Round Robin #1
+
+#run api 4 server db1db2 db3 db4
+
+#run api server db1.json
+docker run -d --name my-api-1 -p 3001:3000 -v C:\Users\tatom\Desktop\nginx-bootcamp\db\db1.json:/usr/app/db.json olanlab/json-server
+
+#run api server db2.json
+docker run -d --name my-api-2 -p 3002:3000 -v C:\Users\tatom\Desktop\nginx-bootcamp\db\db2.json:/usr/app/db.json olanlab/json-server
+
+#run api server db3.json
+docker run -d --name my-api-3 -p 3003:3000 -v C:\Users\tatom\Desktop\nginx-bootcamp\db\db3.json:/usr/app/db.json olanlab/json-server
+
+#run api server db4.json
+docker run -d --name my-api-4 -p 3004:3000 -v C:\Users\tatom\Desktop\nginx-bootcamp\db\db4.json:/usr/app/db.json olanlab/json-server
+
+#edit code
+weight = การเพิ่มภาระงานให้กับ server ที่มีความสามารถมากกว่า
+server host.docker.internal:3001 weight=4;
+server host.docker.internal:3002 weight=2;
+server host.docker.internal:3003 weight=1;
+
+max_fails = จำนวนครั้งที่ server จะลองเชื่อมต่อกับ server อื่นๆ หาก server ที่เรากำลังใช้งานมีปัญหา
+server host.docker.internal:3001 max_fails=2;
+
+fail_timeout = เวลาที่ server จะพยายามเชื่อมต่อกับ server อื่นๆ หาก server ที่เรากำลังใช้งานมีปัญหา
+server host.docker.internal:3001 fail_timeout=15s;
+
+
+#Load Balancing แบบ Least Connections #2
+least_conn = ให้การเชื่อมต่อที่มีการใช้งานน้อยที่สุด
+ upstream apis {
+        least_conn;
+        server host.docker.internal:3001;
+        server host.docker.internal:3002;
+        server host.docker.internal:3003;
+        server host.docker.internal:3004;
+    }
+
+#Load Balancing แบบ IP Hash และ Generic Hash #3
+ip_hash = ipเดิมจะไปยัง serverเดิม ไม่เปลี่ยนแปลง
+upstream apis {
+        ip_hash;
+        server host.docker.internal:3001;
+        server host.docker.internal:3002;
+        server host.docker.internal:3003;
+        server host.docker.internal:3004;
+    }
+
+#Load Balancing แบบ Generic Hash
+hash $request_uri; = uri เดิมจะไปยัง serverเดิม ไม่เปลี่ยนแปลง uri ใหม่จะไปยัง serverใหม่  
+upstream apis {
+        hash $request_uri;
+        server host.docker.internal:3001;
+        server host.docker.internal:3002;
+        server host.docker.internal:3003;
+        server host.docker.internal:3004;
+    }
