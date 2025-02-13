@@ -80,16 +80,16 @@ output json data
 #run api 4 server db1db2 db3 db4
 
 #run api server db1.json
-docker run -d --name my-api-1 -p 3001:3000 -v C:\Users\tatom\Desktop\nginx-bootcamp\db\db1.json:/usr/app/db.json olanlab/json-server
+docker run -d --name my-api-1 -p 3001:3000 -v C:\Users\tatom\Desktop\nginx-bootcamp\db\db1.json:/usr/app/db.json imsuriyapi/json-server
 
 #run api server db2.json
-docker run -d --name my-api-2 -p 3002:3000 -v C:\Users\tatom\Desktop\nginx-bootcamp\db\db2.json:/usr/app/db.json olanlab/json-server
+docker run -d --name my-api-2 -p 3002:3000 -v C:\Users\tatom\Desktop\nginx-bootcamp\db\db2.json:/usr/app/db.json imsuriyapi/json-server
 
 #run api server db3.json
-docker run -d --name my-api-3 -p 3003:3000 -v C:\Users\tatom\Desktop\nginx-bootcamp\db\db3.json:/usr/app/db.json olanlab/json-server
+docker run -d --name my-api-3 -p 3003:3000 -v C:\Users\tatom\Desktop\nginx-bootcamp\db\db3.json:/usr/app/db.json imsuriyapi/json-server
 
 #run api server db4.json
-docker run -d --name my-api-4 -p 3004:3000 -v C:\Users\tatom\Desktop\nginx-bootcamp\db\db4.json:/usr/app/db.json olanlab/json-server
+docker run -d --name my-api-4 -p 3004:3000 -v C:\Users\tatom\Desktop\nginx-bootcamp\db\db4.json:/usr/app/db.json imsuriyapi/json-server
 
 #edit code
 weight = การเพิ่มภาระงานให้กับ server ที่มีความสามารถมากกว่า
