@@ -23,7 +23,7 @@ http {
 
 ----------------------------------------------------------------------------------------------------------------------------
 #run api server
-docker run -d --name my-api -p 3000:3000 olanlab/json-server
+docker run -d --name my-api -p 3000:3000 imsuriyapi/json-server
 
 #run nginx server
 #location nginx.conf file
